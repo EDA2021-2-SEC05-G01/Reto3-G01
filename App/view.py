@@ -24,6 +24,8 @@ import config as cf
 import sys
 import controller
 from DISClib.ADT import list as lt
+from DISClib.ADT import orderedmap as om
+from DISClib.ADT import map as mp
 assert cf
 
 
@@ -35,23 +37,45 @@ operación solicitada
 """
 
 def printMenu():
+    print("\n")
+    print("*******************************************")
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("1- Inicializar Analizador")
+    print("2- Cargar información de UFOS")
+    print("3- Consultar los avistamientos de una ciudad y el total de ciudades donde han habido avistamientos")
+    print("4- Consultar la cantidad de avistamientos que duran un rango específico de tiempo")
+    print("5- Consultar la cantidad de avistamientos ocurridos en un rango de horas")
+    print("6- Consultar los avistamientos en un rango de fechas")
+    print("7- Consultar los avistamientos en una Zona Geográfica")
+    print("0- Cerrar la aplicación")
+    print("*******************************************")
 
-catalog = None
+ufofile = 'UFOS-utf8-small.csv'
+cont = None
 
 """
 Menu principal
 """
 while True:
     printMenu()
-    inputs = input('Seleccione una opción para continuar\n')
+    inputs = input('Seleccione una opción para continuar\n> ')
     if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
+        print("\nInicializando....")
+        # cont es el controlador que se usará de acá en adelante
+        cont = controller.init()
 
     elif int(inputs[0]) == 2:
-        pass
+        print("\nCargando información de crimenes ....\n")
+        controller.loadData(cont, ufofile)
+        print('UFOS cargados: ' + str(controller.UFOSSize(cont)))
+        print('Altura del arbol: ' + str(controller.indexHeight(cont, "dateIndex")))
+        print('Elementos en el arbol: ' + str(controller.indexSize(cont, "dateIndex")))
+        print('Menor Llave: ' + str(controller.minKey(cont, "dateIndex")))
+        print('Mayor Llave: ' + str(controller.maxKey(cont, "dateIndex")))
+
+    elif int(inputs[0]) == 3:
+        print('\nAltura del arbol: ' + str(controller.indexHeight(cont, "cityIndex")))
+        print('\nElementos en el arbol: ' + str(controller.indexSize(cont, "cityIndex")))
 
     else:
         sys.exit(0)

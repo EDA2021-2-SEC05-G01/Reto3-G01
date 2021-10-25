@@ -29,10 +29,72 @@ import csv
 El controlador se encarga de mediar entre la vista y el modelo.
 """
 
-# Inicialización del Catálogo de libros
+# ___________________________________________________
+#  Inicializacion del catalogo
+# ___________________________________________________
 
-# Funciones para la carga de datos
+
+def init():
+    """
+    Llama la funcion de inicializacion  del modelo.
+    """
+    # catalog es utilizado para interactuar con el modelo
+    analyzer = model.newAnalyzer()
+    return analyzer
+
+# ___________________________________________________
+#  Funciones para la carga de datos y almacenamiento
+#  de datos en los modelos
+# ___________________________________________________
+
+def loadData(analyzer, ufosfile):
+    """
+    Carga los datos de los archivos CSV en el modelo
+    """
+    ufofile = cf.data_dir + ufosfile
+    input_file = csv.DictReader(open(ufofile, encoding="utf-8"),
+                                delimiter=",")
+    for ufo in input_file:
+        model.addCrime(analyzer, ufo)
+    return analyzer
 
 # Funciones de ordenamiento
 
-# Funciones de consulta sobre el catálogo
+# ___________________________________________________
+#  Funciones para consultas
+# ___________________________________________________
+
+
+def UFOSSize(analyzer):
+    """
+    Numero de crimenes leidos
+    """
+    return model.UFOSSize(analyzer)
+
+
+def indexHeight(analyzer, name):
+    """
+    Altura del indice (arbol)
+    """
+    return model.indexHeight(analyzer, name)
+
+
+def indexSize(analyzer, name):
+    """
+    Numero de nodos en el arbol
+    """
+    return model.indexSize(analyzer, name)
+
+
+def minKey(analyzer, name):
+    """
+    La menor llave del arbol
+    """
+    return model.minKey(analyzer, name)
+
+
+def maxKey(analyzer, name):
+    """
+    La mayor llave del arbol
+    """
+    return model.maxKey(analyzer, name)
