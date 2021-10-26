@@ -36,6 +36,57 @@ se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
 
+
+# ___________________________________________________
+#  Funciones de print
+# ___________________________________________________
+
+def printgetufosfromcity(cont, lst, city):
+    print("\n---------------------------------------------------------------------------\n")
+    print("El total de ciudades donde han habido avistamientos de UFOS es: " + 
+            str(controller.indexSize(cont, "cityIndex")))
+    size = lt.size(lst)
+    if size:
+        print("\n---------------------------------------------------------------------------\n")
+        print("Han sido registrados " + str(size) + " UFOS en la ciudad " + city)
+        print("\n---------------------------------------------------------------------------\n")
+        print("Los primeros 3 avistamientos en la ciudad " + city)
+        if size > 6:
+            i = 1
+            while i <= 3:
+                ufo = lt.getElement(lst, i)
+                print("\n---------------------------------------------------------------------------\n")
+                print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + city + "\nPaís: " + ufo["country"]
+                        + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo['shape'])
+                i += 1
+            i = size - 2
+            print("\n---------------------------------------------------------------------------\n")
+            print("\nLos últimos 3 avistamientos en la ciudad " + city)
+            while i <= size:
+                ufo = lt.getElement(lst, i)
+                print("\n---------------------------------------------------------------------------\n")
+                print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + city + "\nPaís: " + ufo["country"]
+                        + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo['shape'])
+                i += 1
+        else:
+            for ufo in lst:
+                print("\n---------------------------------------------------------------------------\n")
+                print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + city + "\nPaís: " + ufo["country"]
+                        + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo['shape'])
+
+    else:
+        print("\n---------------------------------------------------------------------------\n")
+        print("La ciudad ingresada es inválida o no han habido avistamientos en dicha ciudad")
+
+
+
+
+
+# ___________________________________________________
+#  Menú
+# ___________________________________________________
+
+
 def printMenu():
     print("\n")
     print("*******************************************")
@@ -50,7 +101,7 @@ def printMenu():
     print("0- Cerrar la aplicación")
     print("*******************************************")
 
-ufofile = 'UFOS-utf8-small.csv'
+ufofile = 'UFOS-utf8-large.csv'
 cont = None
 
 """
@@ -65,7 +116,7 @@ while True:
         cont = controller.init()
 
     elif int(inputs[0]) == 2:
-        print("\nCargando información de crimenes ....\n")
+        print("\nCargando información de UFOS ....\n")
         controller.loadData(cont, ufofile)
         print('UFOS cargados: ' + str(controller.UFOSSize(cont)))
         print('Altura del arbol: ' + str(controller.indexHeight(cont, "dateIndex")))
@@ -74,8 +125,9 @@ while True:
         print('Mayor Llave: ' + str(controller.maxKey(cont, "dateIndex")))
 
     elif int(inputs[0]) == 3:
-        print('\nAltura del arbol: ' + str(controller.indexHeight(cont, "cityIndex")))
-        print('\nElementos en el arbol: ' + str(controller.indexSize(cont, "cityIndex")))
+        city = input('Ingrese la ciudad que desea consultar:\n>')
+        lst = controller.getufosfromcity(cont, city)
+        printgetufosfromcity(cont, lst, city)
 
     else:
         sys.exit(0)

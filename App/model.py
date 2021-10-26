@@ -31,7 +31,9 @@ from DISClib.ADT import list as lt
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import map as m
+from DISClib.Algorithms.Sorting import mergesort as mg
 import datetime
+from time import strptime
 assert config
 
 """
@@ -125,7 +127,7 @@ def addDateIndex(datentry, ufo):
         m.put(ufocity, ufo['city'], entry)
     else:
         entry = me.getValue(offentry)
-        lt.addLast(entry['lstcities'], ufo)
+        lt.addLast(entry['lstufos'], ufo)
     return datentry
 
 def addCityIndex(cityentry, ufo):
@@ -159,6 +161,11 @@ def newcityEntry(offensegrp, ufo):
 # ==============================
 # Funciones de consulta
 # ==============================
+
+def getufosfromcity(analyzer, city):
+    lst = (om.get(analyzer['cityIndex'], city)['value'])['lstufos']
+    compareda(lst)
+    return lst
 
 
 def UFOSSize(analyzer):
@@ -220,6 +227,13 @@ def compareCities(city1, city2):
     else:
         return -1
 
+def comparedat(ufo1, ufo2):
+    date1 = ufo1['datetime']
+    date2 = ufo2['datetime']
+    date1 = strptime(date1, '%Y-%m-%d %H:%M:%S')
+    date2 = strptime(date2, '%Y-%m-%d %H:%M:%S')
+    return date1 < date2
+
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 # Funciones de ordenamiento
@@ -235,3 +249,7 @@ def compareOffenses(offense1, offense2):
         return 1
     else:
         return -1
+
+def compareda(lst):
+    mg.sort(lst, comparedat)
+    return lst

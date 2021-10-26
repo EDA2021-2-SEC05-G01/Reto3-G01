@@ -65,9 +65,12 @@ def loadData(analyzer, ufosfile):
 # ___________________________________________________
 
 
+def getufosfromcity(analyzer, city):
+    return model.getufosfromcity(analyzer, city)
+
 def UFOSSize(analyzer):
     """
-    Numero de crimenes leidos
+    Numero de UFOS leidos
     """
     return model.UFOSSize(analyzer)
 
