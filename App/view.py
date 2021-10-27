@@ -41,6 +41,31 @@ operación solicitada
 #  Funciones de print
 # ___________________________________________________
 
+
+def printcargadedatos(cont):
+    print("\n---------------------------------------------------------------------------\n")
+    print("El total de avistamientos de UFOS cargados es: " + str(controller.UFOSSize(cont)))
+    print("\n---------------------------------------------------------------------------\n")
+    i = 1
+    l = lt.newList("ARRAY_LIST")
+    lst = cont['ufos']
+    print("Los primeros cinco avistamientos: ")
+    while i <= 5:
+        ufo = lt.getElement(lst, i)
+        print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
+                + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
+        uf = lt.lastElement(lst)
+        lt.removeLast(lst)
+        lt.addFirst(l, uf)
+        i += 1
+    print("\n---------------------------------------------------------------------------\n")
+    print("Los últimos cinco avistamientos: ")
+    for u in lt.iterator(l):
+        print("\nDatatime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+
+
+
 def printgetufosfromcity(cont, lst, city):
     print("\n---------------------------------------------------------------------------\n")
     print("El total de ciudades donde han habido avistamientos de UFOS es: " + 
@@ -79,6 +104,41 @@ def printgetufosfromcity(cont, lst, city):
         print("La ciudad ingresada es inválida o no han habido avistamientos en dicha ciudad")
 
 
+def printgetufosfromduration(cont, mayores, lst, lmtinf, lmtsup):
+    print("\n---------------------------------------------------------------------------\n")
+    print("Hay " + str(controller.indexSize(cont, "durationn")) + " duraciones en UFOS")
+    print("\n---------------------------------------------------------------------------\n")
+    print("Las 5 duraciones más largas de avistamientos de UFOS:")
+    for m in lt.iterator(mayores):
+        x = cont['durationn']
+        g = om.get(x, float(m))
+        print("\n" + m + ": "+ str(lt.size(((g['value'])['lstufos']))))
+    size = lt.size(lst)
+    print("\n---------------------------------------------------------------------------\n")
+    print("Hay " + str(size) + " avistamientos que duran entre " + str(lmtinf) + " y " + str(lmtsup) + " segundos")
+    if size:
+        i = 1
+        l = lt.newList("ARRAY_LIST")
+        print("\n---------------------------------------------------------------------------\n")
+        print("Los primeros tres avistamientos en este rango:")
+        while i <= 3:
+            ufo = lt.getElement(lst, i)
+            print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
+                    + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
+            uf = lt.lastElement(lst)
+            lt.removeLast(lst)
+            lt.addFirst(l, uf)
+            i += 1
+        print("\n---------------------------------------------------------------------------\n")
+        print("Los últimos tres avistamientos en este rango: ")
+        for u in lt.iterator(l):
+            print("\nDatatime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                    + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+
+
+
+
+
 
 
 
@@ -101,7 +161,7 @@ def printMenu():
     print("0- Cerrar la aplicación")
     print("*******************************************")
 
-ufofile = 'UFOS-utf8-large.csv'
+ufofile = 'UFOS-utf8-small.csv'
 cont = None
 
 """
@@ -118,16 +178,23 @@ while True:
     elif int(inputs[0]) == 2:
         print("\nCargando información de UFOS ....\n")
         controller.loadData(cont, ufofile)
-        print('UFOS cargados: ' + str(controller.UFOSSize(cont)))
-        print('Altura del arbol: ' + str(controller.indexHeight(cont, "dateIndex")))
-        print('Elementos en el arbol: ' + str(controller.indexSize(cont, "dateIndex")))
-        print('Menor Llave: ' + str(controller.minKey(cont, "dateIndex")))
-        print('Mayor Llave: ' + str(controller.maxKey(cont, "dateIndex")))
+        printcargadedatos(cont)
 
     elif int(inputs[0]) == 3:
         city = input('Ingrese la ciudad que desea consultar:\n>')
         lst = controller.getufosfromcity(cont, city)
         printgetufosfromcity(cont, lst, city)
+
+    elif int(inputs[0]) == 4:
+        lmtinf = float(input("Ingrese el límite inferior de duración:\n>"))
+        lmtsup = float(input("Ingrese el límite superior de duración:\n>"))
+        print('Altura del arbol: ' + str(controller.indexHeight(cont, "durationn")))
+        print('Elementos en el arbol: ' + str(controller.indexSize(cont, "durationn")))
+        print('Menor Llave: ' + str(controller.minKey(cont, "durationn")))
+        print('Mayor Llave: ' + str(controller.maxKey(cont, "durationn")))
+        mayores = (controller.cincomayores(cont))
+        lst = controller.getufosfromduration(cont, lmtinf, lmtsup)
+        printgetufosfromduration(cont, mayores, lst, lmtinf, lmtsup)
 
     else:
         sys.exit(0)

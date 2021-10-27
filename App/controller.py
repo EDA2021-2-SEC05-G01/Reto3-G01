@@ -56,6 +56,7 @@ def loadData(analyzer, ufosfile):
                                 delimiter=",")
     for ufo in input_file:
         model.addCrime(analyzer, ufo)
+    model.compareda(analyzer['ufos'])
     return analyzer
 
 # Funciones de ordenamiento
@@ -63,6 +64,9 @@ def loadData(analyzer, ufosfile):
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
+
+def getufosfromduration(analyzer, lmtinf, lmtsup):
+    return model.getufosfromduration(analyzer, lmtinf, lmtsup)
 
 
 def getufosfromcity(analyzer, city):
@@ -101,3 +105,7 @@ def maxKey(analyzer, name):
     La mayor llave del arbol
     """
     return model.maxKey(analyzer, name)
+
+
+def cincomayores(mapa):
+    return model.cincomayores(mapa)

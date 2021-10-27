@@ -57,7 +57,9 @@ def newAnalyzer():
     """
     analyzer = {'ufos': None,
                 'dateIndex': None,
-                'cityIndex': None
+                'cityIndex': None,
+                'duration': None,
+                'lstdur': None
                 }
 
     analyzer['ufos'] = lt.newList('SINGLE_LINKED')
@@ -65,6 +67,9 @@ def newAnalyzer():
                                       comparefunction=compareDates)
     analyzer['cityIndex'] = om.newMap(omaptype='RBT',
                                         comparefunction=compareCities)
+    analyzer['durationn'] = om.newMap(omaptype='RBT', 
+                                        comparefunction=compareduration)
+    analyzer['lstdur'] = lt.newList("ARRAY_LIST")
     return analyzer
 
 # Funciones para agregar informacion al catalogo
@@ -75,6 +80,9 @@ def addCrime(analyzer, ufo):
     lt.addLast(analyzer['ufos'], ufo)
     updateDateIndex(analyzer['dateIndex'], ufo)
     updatecityIndex(analyzer['cityIndex'], ufo)
+    updatedurationindex(analyzer['durationn'], ufo)
+    if lt.isPresent(analyzer['lstdur'], ufo['duration (seconds)']) == 0:
+        lt.addLast(analyzer['lstdur'], ufo['duration (seconds)'])
     return analyzer
 
 
@@ -102,27 +110,32 @@ def updatecityIndex(map, ufo):
     city = ufo["city"]
     entry = om.get(map, city)
     if entry is None:
-        cityentry = newcityEntry(city, ufo)
+        cityentry = newcityEntry(ufo)
         om.put(map, city, cityentry)
     else:
         cityentry = me.getValue(entry)
     addCityIndex(cityentry, ufo)
     return map
 
+def updatedurationindex(map, ufo):
+    duration = ufo["duration (seconds)"]
+    entry = om.get(map, float(duration))
+    if entry is None:
+        duraentry = newdurationEntry(ufo)
+        om.put(map, float(duration), duraentry)
+    else:
+        duraentry = me.getValue(entry)
+    adddurationIndex(duraentry, ufo)
+    return map
+
 
 def addDateIndex(datentry, ufo):
-    """
-    Actualiza un indice de tipo de crimenes.  Este indice tiene una lista
-    de crimenes y una tabla de hash cuya llave es el tipo de crimen y
-    el valor es una lista con los crimenes de dicho tipo en la fecha que
-    se está consultando (dada por el nodo del arbol)
-    """
     lst = datentry['lstufos']
     lt.addLast(lst, ufo)
     ufocity = datentry['ufocity']
     offentry = m.get(ufocity, ufo['city'])
     if (offentry is None):
-        entry = newcityEntry(ufo['city'], ufo)
+        entry = newcityEntry(ufo)
         lt.addLast(entry['lstufos'], ufo)
         m.put(ufocity, ufo['city'], entry)
     else:
@@ -133,7 +146,30 @@ def addDateIndex(datentry, ufo):
 def addCityIndex(cityentry, ufo):
     lst = cityentry['lstufos']
     lt.addLast(lst, ufo)
-    return cityentry    
+    ufocity = cityentry['city']
+    offentry = m.get(ufocity, ufo['city'])
+    if (offentry is None):
+        entry = newcityEntry(ufo)
+        lt.addLast(entry['lstufos'], ufo)
+        m.put(ufocity, ufo['city'], entry)
+    else:
+        entry = me.getValue(offentry)
+        lt.addLast(entry['lstufos'], ufo)
+    return cityentry
+
+def adddurationIndex(cityentry, ufo):
+    lst = cityentry['lstufos']
+    lt.addLast(lst, ufo)
+    ufodur = cityentry['duration']
+    offentry = m.get(ufodur, ufo['duration (seconds)'])
+    if (offentry is None):
+        entry = newdurationEntry(ufo)
+        lt.addLast(entry['lstufos'], ufo)
+        m.put(ufodur, ufo['duration (seconds)'], entry)
+    else:
+        entry = me.getValue(offentry)
+        lt.addLast(entry['lstufos'], ufo)
+    return cityentry 
 
 def newDataEntry(ufo):
     """
@@ -146,17 +182,35 @@ def newDataEntry(ufo):
     entry['lstufos'] = lt.newList('SINGLE_LINKED', compareDates)
     return entry
 
-def newcityEntry(offensegrp, ufo):
+def newcityEntry(ufo):
     """
-    Crea una entrada en el indice por tipo de crimen, es decir en
+    Crea una entrada en el indice por tipo de ufo, es decir en
     la tabla de hash, que se encuentra en cada nodo del arbol.
     """
     ofentry = {'city': None, 'lstufos': None}
-    ofentry['city'] = offensegrp
+    ofentry['city'] = m.newMap(numelements=1000,
+                                     maptype='PROBING')
     ofentry['lstufos'] = lt.newList('SINGLELINKED')
     return ofentry
 
-# Funciones para creacion de datos
+def newdurationEntry(ufo):
+    ofentry = {'duration': None, 'lstufos': None}
+    ofentry['duration'] = m.newMap(numelements=1000,
+                                     maptype='PROBING')
+    ofentry['lstufos'] = lt.newList('SINGLELINKED')
+    return ofentry
+
+def cincomayores(analyzer):
+    lst = analyzer['lstdur']
+    l = lt.newList("ARRAY_LIST")
+    compareduratio(lst)
+    i = 1
+    while i <= 5:
+        mayor = lt.firstElement(lst)
+        lt.addLast(l, mayor)
+        lt.removeFirst(lst)
+        i += 1
+    return l
 
 # ==============================
 # Funciones de consulta
@@ -165,6 +219,18 @@ def newcityEntry(offensegrp, ufo):
 def getufosfromcity(analyzer, city):
     lst = (om.get(analyzer['cityIndex'], city)['value'])['lstufos']
     compareda(lst)
+    return lst
+
+def getufosfromduration(analyzer, lmtinf, lmtsup):
+    lst = lt.newList("ARRAY_LIST")
+    while lmtinf <= lmtsup:
+        ufos = om.get(analyzer['durationn'], lmtinf)
+        if ufos != None:
+            ufos = (ufos['value'])['lstufos']
+            for ufo in lt.iterator(ufos):
+                lt.addLast(lst, ufo)
+        lmtinf = float(lmtinf) + 1
+    compared(lst)
     return lst
 
 
@@ -227,12 +293,26 @@ def compareCities(city1, city2):
     else:
         return -1
 
+def compareduration(d1, d2):
+    if (d1 == d2):
+        return 0
+    elif (d1 > d2):
+        return 1
+    else:
+        return -1
+
 def comparedat(ufo1, ufo2):
     date1 = ufo1['datetime']
     date2 = ufo2['datetime']
     date1 = strptime(date1, '%Y-%m-%d %H:%M:%S')
     date2 = strptime(date2, '%Y-%m-%d %H:%M:%S')
     return date1 < date2
+
+def comparedur(dur1, dur2):
+    return float(dur1) > float(dur2)
+
+def comparedo(d1, d2):
+    return float(d1['duration (seconds)']) < float(d2['duration (seconds)'])
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
@@ -252,4 +332,12 @@ def compareOffenses(offense1, offense2):
 
 def compareda(lst):
     mg.sort(lst, comparedat)
+    return lst
+
+def compareduratio(lst):
+    mg.sort(lst, comparedur)
+    return lst
+
+def compared(lst):
+    mg.sort(lst, comparedo)
     return lst
