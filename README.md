@@ -1,6 +1,6 @@
 
-- Est 1: Req 3 - Johan Alejandro Charry - 202111151 - ja.charry@uniandes.edu.co
-- Est 2: Req 2 - Nicolas Toro Barrios - 202116790 - n.torob@uniandes.edu.co
+- Est 1: Req 2 - Johan Alejandro Charry - 202111151 - ja.charry@uniandes.edu.co
+- Est 2: Req 3 - Nicolas Toro Barrios - 202116790 - n.torob@uniandes.edu.co
 
 #ISIS1225 - Librerias de soporte
 
