@@ -55,46 +55,40 @@ def newAnalyzer():
 
     Retorna el analizador inicializado.
     """
-    analyzer = {'ufos': None,
+    analyzer = {'ufos':None,
                 'dateIndex': None,
                 'cityIndex': None,
                 'duration': None,
-                'lstdur': None
+                'dates': None,
+                'latitudes': None
                 }
-
-    analyzer['ufos'] = lt.newList('SINGLE_LINKED')
+    analyzer['ufos'] = lt.newList("ARRAY_LIST")
     analyzer['dateIndex'] = om.newMap(omaptype='RBT',
                                       comparefunction=compareDates)
-    analyzer['cityIndex'] = om.newMap(omaptype='RBT',
-                                        comparefunction=compareCities)
+    analyzer['cityIndex'] = m.newMap(numelements=805,
+                                        maptype='CHAINING',
+                                        loadfactor=2.0,)
     analyzer['durationn'] = om.newMap(omaptype='RBT', 
                                         comparefunction=compareduration)
-    analyzer['lstdur'] = lt.newList("ARRAY_LIST")
+    analyzer['dates'] = om.newMap(omaptype='RBT',
+                                      comparefunction=compareDates)
+    analyzer['latitudes'] = om.newMap(omaptype='RBT',
+                                    comparefunction=comparelatitudes)
     return analyzer
 
 # Funciones para agregar informacion al catalogo
 
 def addCrime(analyzer, ufo):
-    """
-    """
     lt.addLast(analyzer['ufos'], ufo)
     updateDateIndex(analyzer['dateIndex'], ufo)
     updatecityIndex(analyzer['cityIndex'], ufo)
     updatedurationindex(analyzer['durationn'], ufo)
-    if lt.isPresent(analyzer['lstdur'], ufo['duration (seconds)']) == 0:
-        lt.addLast(analyzer['lstdur'], ufo['duration (seconds)'])
+    updatedateIndex(analyzer['dates'], ufo)
+    updatelatitudeIndex(analyzer['latitudes'], ufo)
     return analyzer
 
 
 def updateDateIndex(map, ufo):
-    """
-    Se toma la fecha del crimen y se busca si ya existe en el arbol
-    dicha fecha.  Si es asi, se adiciona a su lista de crimenes
-    y se actualiza el indice de tipos de crimenes.
-
-    Si no se encuentra creado un nodo para esa fecha en el arbol
-    se crea y se actualiza el indice de tipos de crimenes
-    """
     datet = ufo['datetime']
     ufodate = datetime.datetime.strptime(datet, '%Y-%m-%d %H:%M:%S')
     entry = om.get(map, ufodate.date())
@@ -108,13 +102,14 @@ def updateDateIndex(map, ufo):
 
 def updatecityIndex(map, ufo):
     city = ufo["city"]
-    entry = om.get(map, city)
-    if entry is None:
-        cityentry = newcityEntry(ufo)
-        om.put(map, city, cityentry)
+    if m.contains(map, city):
+        lst = (m.get(map, city))['value']
+        lt.addLast(lst, ufo)
+        m.put(map, city, lst)
     else:
-        cityentry = me.getValue(entry)
-    addCityIndex(cityentry, ufo)
+        lst = lt.newList('SINGLE_LINKED')
+        lt.addLast(lst, ufo)
+        m.put(map, city, lst)
     return map
 
 def updatedurationindex(map, ufo):
@@ -128,6 +123,29 @@ def updatedurationindex(map, ufo):
     adddurationIndex(duraentry, ufo)
     return map
 
+def updatedateIndex(map, ufo):
+    datet = (ufo['datetime'])[:10]
+    ufodate = datetime.datetime.strptime(datet, '%Y-%m-%d')
+    entry = om.get(map, ufodate.date())
+    if entry is None:
+        datentry = newdataEntry(ufo)
+        om.put(map, ufodate.date(), datentry)
+    else:
+        datentry = me.getValue(entry)
+    addDateIndex(datentry, ufo)
+    return map
+
+def updatelatitudeIndex(map, ufo):
+    lat = round(float(ufo['latitude']),2)
+    entry = om.get(map, lat)
+    if entry is None:
+        datentry = newlatitudeEntry(ufo)
+        om.put(map, lat, datentry)
+    else:
+        datentry = me.getValue(entry)
+    addlatitudeIndex(datentry, ufo)
+    return map
+
 
 def addDateIndex(datentry, ufo):
     lst = datentry['lstufos']
@@ -135,27 +153,13 @@ def addDateIndex(datentry, ufo):
     ufocity = datentry['ufocity']
     offentry = m.get(ufocity, ufo['city'])
     if (offentry is None):
-        entry = newcityEntry(ufo)
+        entry = newDataEntry(ufo)
         lt.addLast(entry['lstufos'], ufo)
         m.put(ufocity, ufo['city'], entry)
     else:
         entry = me.getValue(offentry)
         lt.addLast(entry['lstufos'], ufo)
     return datentry
-
-def addCityIndex(cityentry, ufo):
-    lst = cityentry['lstufos']
-    lt.addLast(lst, ufo)
-    ufocity = cityentry['city']
-    offentry = m.get(ufocity, ufo['city'])
-    if (offentry is None):
-        entry = newcityEntry(ufo)
-        lt.addLast(entry['lstufos'], ufo)
-        m.put(ufocity, ufo['city'], entry)
-    else:
-        entry = me.getValue(offentry)
-        lt.addLast(entry['lstufos'], ufo)
-    return cityentry
 
 def adddurationIndex(cityentry, ufo):
     lst = cityentry['lstufos']
@@ -169,7 +173,22 @@ def adddurationIndex(cityentry, ufo):
     else:
         entry = me.getValue(offentry)
         lt.addLast(entry['lstufos'], ufo)
-    return cityentry 
+    return cityentry
+
+
+def addlatitudeIndex(cityentry, ufo):
+    lst = cityentry['lstufos']
+    lt.addLast(lst, ufo)
+    ufodur = cityentry['latitude']
+    offentry = m.get(ufodur, round(float(ufo['latitude']),2))
+    if (offentry is None):
+        entry = newlatitudeEntry(ufo)
+        lt.addLast(entry['lstufos'], ufo)
+        m.put(ufodur, round(float(ufo['latitude']),2), entry)
+    else:
+        entry = me.getValue(offentry)
+        lt.addLast(entry['lstufos'], ufo)
+    return cityentry  
 
 def newDataEntry(ufo):
     """
@@ -178,46 +197,49 @@ def newDataEntry(ufo):
     """
     entry = {'ufocity': None, 'lstufos': None}
     entry['ufocity'] = m.newMap(numelements=30,
-                                     maptype='PROBING')
-    entry['lstufos'] = lt.newList('SINGLE_LINKED', compareDates)
+                                    maptype='CHAINING',
+                                   loadfactor=2.0)
+    entry['lstufos'] = lt.newList('SINGLE_LINKED')
     return entry
 
-def newcityEntry(ufo):
+
+def newdataEntry(ufo):
     """
-    Crea una entrada en el indice por tipo de ufo, es decir en
-    la tabla de hash, que se encuentra en cada nodo del arbol.
+    Crea una entrada en el indice por fechas, es decir en el arbol
+    binario.
     """
-    ofentry = {'city': None, 'lstufos': None}
-    ofentry['city'] = m.newMap(numelements=1000,
-                                     maptype='PROBING')
-    ofentry['lstufos'] = lt.newList('SINGLELINKED')
-    return ofentry
+    entry = {'ufocity': None, 'lstufos': None}
+    entry['ufocity'] = m.newMap(numelements=805,
+                                    maptype='CHAINING',
+                                   loadfactor=2.0)
+    entry['lstufos'] = lt.newList('SINGLE_LINKED')
+    return entry
 
 def newdurationEntry(ufo):
     ofentry = {'duration': None, 'lstufos': None}
-    ofentry['duration'] = m.newMap(numelements=1000,
-                                     maptype='PROBING')
-    ofentry['lstufos'] = lt.newList('SINGLELINKED')
+    ofentry['duration'] = m.newMap(numelements=60,
+                                    maptype='CHAINING',
+                                   loadfactor=2.0)
+    ofentry['lstufos'] = lt.newList('SINGLE_LINKED')
     return ofentry
 
-def cincomayores(analyzer):
-    lst = analyzer['lstdur']
-    l = lt.newList("ARRAY_LIST")
-    compareduratio(lst)
-    i = 1
-    while i <= 5:
-        mayor = lt.firstElement(lst)
-        lt.addLast(l, mayor)
-        lt.removeFirst(lst)
-        i += 1
-    return l
+
+def newlatitudeEntry(ufo):
+    ofentry = {'latitude': None, 'lstufos': None}
+    ofentry['latitude'] = m.newMap(numelements=575,
+                                    maptype='CHAINING',
+                                   loadfactor=2.0)
+    ofentry['lstufos'] = lt.newList('SINGLE_LINKED')
+    return ofentry
+
+
 
 # ==============================
 # Funciones de consulta
 # ==============================
 
 def getufosfromcity(analyzer, city):
-    lst = (om.get(analyzer['cityIndex'], city)['value'])['lstufos']
+    lst = (m.get(analyzer['cityIndex'], city)['value'])
     compareda(lst)
     return lst
 
@@ -232,6 +254,34 @@ def getufosfromduration(analyzer, lmtinf, lmtsup):
         lmtinf = float(lmtinf) + 1
     compared(lst)
     return lst
+
+def getuforbydate(analyzer, lmtinf, lmtsup):
+    dates = analyzer['dates']
+    lstdates = om.keySet(dates)
+    lista = lt.newList("ARRAY_LIST")
+    lmtinf = datetime.datetime.strptime(lmtinf, '%Y-%m-%d')
+    lmtsup = datetime.datetime.strptime(lmtsup, '%Y-%m-%d')
+    posi = lt.isPresent(lstdates, om.ceiling(dates, lmtinf.date()))
+    posf = lt.isPresent(lstdates, om.floor(dates, lmtsup.date()))
+    while posi <= posf:
+        elemento = (om.get(dates, lt.getElement(lstdates, posi))['value'])['lstufos']
+        for e in lt.iterator(elemento):
+            lt.addLast(lista, e)
+        posi += 1
+    return lista
+
+def getufosbylocalitation(analyzer, lmtinf, lmtsup, loninf, lonsup):
+    lmtinf = om.ceiling(analyzer['latitudes'], lmtinf)
+    lmtsup = om.floor(analyzer['latitudes'], lmtsup)
+    lista = lt.newList("ARRAY_LIST")
+    lstlatitudes = om.keys(analyzer['latitudes'], lmtinf, lmtsup)
+    for lat in lt.iterator(lstlatitudes):
+        la = ((om.get(analyzer['latitudes'], lat)['value'])['lstufos'])
+        for l in lt.iterator(la):
+            if round(float(l['longitude']),2) >= loninf and round(float(l['longitude']),2) <= lonsup:
+                lt.addLast(lista, l)
+    compareda(lista)
+    return lista
 
 
 def UFOSSize(analyzer):
@@ -301,11 +351,26 @@ def compareduration(d1, d2):
     else:
         return -1
 
+def comparelatitudes(l1, l2):
+    if (l1 == l2):
+        return 0
+    elif (l1 > l2):
+        return 1
+    else:
+        return -1
+
 def comparedat(ufo1, ufo2):
     date1 = ufo1['datetime']
     date2 = ufo2['datetime']
     date1 = strptime(date1, '%Y-%m-%d %H:%M:%S')
     date2 = strptime(date2, '%Y-%m-%d %H:%M:%S')
+    return date1 < date2
+
+def comparefecha(ufo1, ufo2):
+    date1 = ufo1['datetime']
+    date2 = ufo2['datetime']
+    date1 = strptime(date1, '%Y-%m-%d')
+    date2 = strptime(date2, '%Y-%m-%d')
     return date1 < date2
 
 def comparedur(dur1, dur2):
@@ -340,4 +405,8 @@ def compareduratio(lst):
 
 def compared(lst):
     mg.sort(lst, comparedo)
+    return lst
+
+def compararfecha(lst):
+    mg.sort(lst, comparefecha)
     return lst

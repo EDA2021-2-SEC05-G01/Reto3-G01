@@ -20,12 +20,15 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+from time import strptime
 import config as cf
 import sys
 import controller
 from DISClib.ADT import list as lt
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map as mp
+import datetime
+from time import process_time
 assert cf
 
 
@@ -80,7 +83,6 @@ def printgetufosfromcity(cont, lst, city):
             i = 1
             while i <= 3:
                 ufo = lt.getElement(lst, i)
-                print("\n---------------------------------------------------------------------------\n")
                 print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + city + "\nPaís: " + ufo["country"]
                         + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo['shape'])
                 i += 1
@@ -89,7 +91,6 @@ def printgetufosfromcity(cont, lst, city):
             print("\nLos últimos 3 avistamientos en la ciudad " + city)
             while i <= size:
                 ufo = lt.getElement(lst, i)
-                print("\n---------------------------------------------------------------------------\n")
                 print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + city + "\nPaís: " + ufo["country"]
                         + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo['shape'])
                 i += 1
@@ -104,15 +105,15 @@ def printgetufosfromcity(cont, lst, city):
         print("La ciudad ingresada es inválida o no han habido avistamientos en dicha ciudad")
 
 
-def printgetufosfromduration(cont, mayores, lst, lmtinf, lmtsup):
+def printgetufosfromduration(cont, lst, lmtinf, lmtsup):
     print("\n---------------------------------------------------------------------------\n")
     print("Hay " + str(controller.indexSize(cont, "durationn")) + " duraciones en UFOS")
     print("\n---------------------------------------------------------------------------\n")
-    print("Las 5 duraciones más largas de avistamientos de UFOS:")
-    for m in lt.iterator(mayores):
-        x = cont['durationn']
-        g = om.get(x, float(m))
-        print("\n" + m + ": "+ str(lt.size(((g['value'])['lstufos']))))
+    print("La duración más larga de un avistamiento de UFOS:")
+    m = str(controller.maxKey(cont, "durationn"))
+    x = cont['durationn']
+    g = om.get(x, float(m))
+    print("\n" + m + ": "+ str(lt.size(((g['value'])['lstufos']))))
     size = lt.size(lst)
     print("\n---------------------------------------------------------------------------\n")
     print("Hay " + str(size) + " avistamientos que duran entre " + str(lmtinf) + " y " + str(lmtsup) + " segundos")
@@ -136,7 +137,33 @@ def printgetufosfromduration(cont, mayores, lst, lmtinf, lmtsup):
                     + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
 
 
-
+def printgetuforbydate(cont,lst, lmtinf, lmtsup):
+    print("\n---------------------------------------------------------------------------\n")
+    print("Hay " + str(lt.size(cont['lstdates'])) + " fechas [YYYY-MM-DD] diferentes en las que se han reportado ufos.")
+    print("\n---------------------------------------------------------------------------\n")
+    print("La fecha más antigua en la que se ha reportado un avistamiento es:\n" + str(controller.minKey(cont, "dates")) +
+            ": " + str(lt.size(((om.get(cont["dates"], controller.minKey(cont, "dates")))['value'])['lstufos'])))
+    size = lt.size(lst)
+    if size:
+        print("\n---------------------------------------------------------------------------\n")
+        print("Hay " + str(size) + " UFOS reportados entre " + str(lmtinf) + " y " + str(lmtsup))
+        i = 1
+        l = lt.newList("ARRAY_LIST")
+        print("\n---------------------------------------------------------------------------\n")
+        print("Los primeros tres avistamientos en este rango:")
+        while i <= 3:
+            ufo = lt.getElement(lst, i)
+            print("\nDatetime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
+                    + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
+            uf = lt.lastElement(lst)
+            lt.removeLast(lst)
+            lt.addFirst(l, uf)
+            i += 1
+        print("\n---------------------------------------------------------------------------\n")
+        print("Los últimos tres avistamientos en este rango: ")
+        for u in lt.iterator(l):
+            print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                    + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
 
 
 
@@ -177,7 +204,13 @@ while True:
 
     elif int(inputs[0]) == 2:
         print("\nCargando información de UFOS ....\n")
+        #PRUEBA DE EJECUCIÓN
+        start_time = process_time()
         controller.loadData(cont, ufofile)
+        #PRUEBAS DE EJECUCIÓN
+        stop_time = process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("tiempo de ejecución: " + str(elapsed_time_mseg))
         printcargadedatos(cont)
 
     elif int(inputs[0]) == 3:
@@ -192,9 +225,26 @@ while True:
         print('Elementos en el arbol: ' + str(controller.indexSize(cont, "durationn")))
         print('Menor Llave: ' + str(controller.minKey(cont, "durationn")))
         print('Mayor Llave: ' + str(controller.maxKey(cont, "durationn")))
-        mayores = (controller.cincomayores(cont))
         lst = controller.getufosfromduration(cont, lmtinf, lmtsup)
-        printgetufosfromduration(cont, mayores, lst, lmtinf, lmtsup)
+        printgetufosfromduration(cont, lst, lmtinf, lmtsup)
+
+    elif int(inputs[0]) == 6:
+        lmtinf = input("Ingrese el límite inferior del rango de fechas:\n>")
+        lmtsup = input("Ingrese el límite superior del rango de fechas:\n>")
+        lst = controller.getuforbydate(cont, lmtinf, lmtsup)
+        printgetuforbydate(cont, lst, lmtinf, lmtsup)
+
+    elif int(inputs[0]) == 7:
+        lmtinf =  round(float(input("Ingrese el límite inferior del rango de latitudes:\n>")),2)
+        lmtsup =  round(float(input("Ingrese el límite superior del rango de latitudes:\n>")),2)
+        loninf =  round(float(input("Ingrese el límite inferior del rango de longitud:\n>")),2)
+        lonsup =  round(float(input("Ingrese el límite superior del rango de longitud:\n>")),2)
+        print('Altura del arbol: ' + str(controller.indexHeight(cont, "latitudes")))
+        print('Elementos en el arbol: ' + str(controller.indexSize(cont, "latitudes")))
+        print('Menor Llave: ' + str(controller.minKey(cont, "latitudes")))
+        print('Mayor Llave: ' + str(controller.maxKey(cont, "latitudes")))
+        print(controller.getufosbylocalitation(cont, lmtinf, lmtsup, loninf, lonsup))
+
 
     else:
         sys.exit(0)

@@ -72,6 +72,12 @@ def getufosfromduration(analyzer, lmtinf, lmtsup):
 def getufosfromcity(analyzer, city):
     return model.getufosfromcity(analyzer, city)
 
+def getuforbydate(analyzer, lmtinf, lmtsup):
+    return model.getuforbydate(analyzer, lmtinf, lmtsup)
+
+def getufosbylocalitation(analyzer, lmtinf, lmtsup, loninf, lonsup):
+    return model.getufosbylocalitation(analyzer, lmtinf, lmtsup, loninf, lonsup)
+
 def UFOSSize(analyzer):
     """
     Numero de UFOS leidos
@@ -106,6 +112,3 @@ def maxKey(analyzer, name):
     """
     return model.maxKey(analyzer, name)
 
-
-def cincomayores(mapa):
-    return model.cincomayores(mapa)
