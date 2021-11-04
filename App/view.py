@@ -233,7 +233,7 @@ def printMenu():
     print("0- Cerrar la aplicación")
     print("*******************************************")
 
-ufofile = 'UFOS-utf8-small.csv'
+ufofile = 'UFOS-utf8-5pct.csv'
 cont = None
 
 """
@@ -251,7 +251,9 @@ while True:
         print("\nCargando información de UFOS ....\n")
         #PRUEBA DE EJECUCIÓN
         start_time = process_time()
+
         controller.loadData(cont, ufofile)
+
         #PRUEBAS DE EJECUCIÓN
         stop_time = process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
@@ -260,19 +262,43 @@ while True:
 
     elif int(inputs[0]) == 3:
         city = input('Ingrese la ciudad que desea consultar:\n>')
+        #PRUEBA DE EJECUCIÓN
+        start_time = process_time()
+
         lst = controller.getufosfromcity(cont, city)
+
+        #PRUEBAS DE EJECUCIÓN
+        stop_time = process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("tiempo de ejecución: " + str(elapsed_time_mseg))
         printgetufosfromcity(cont, lst, city)
 
     elif int(inputs[0]) == 4:
         lmtinf = float(input("Ingrese el límite inferior de duración:\n>"))
         lmtsup = float(input("Ingrese el límite superior de duración:\n>"))
+        #PRUEBA DE EJECUCIÓN
+        start_time = process_time()
+
         lst = controller.getufosfromduration(cont, lmtinf, lmtsup)
+
+        #PRUEBAS DE EJECUCIÓN
+        stop_time = process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("tiempo de ejecución: " + str(elapsed_time_mseg))
         printgetufosfromduration(cont, lst, lmtinf, lmtsup)
 
     elif int(inputs[0]) == 6:
         lmtinf = input("Ingrese el límite inferior del rango de fechas:\n>")
         lmtsup = input("Ingrese el límite superior del rango de fechas:\n>")
+        #PRUEBA DE EJECUCIÓN
+        start_time = process_time()
+
         lst = controller.getuforbydate(cont, lmtinf, lmtsup)
+
+        #PRUEBAS DE EJECUCIÓN
+        stop_time = process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("tiempo de ejecución: " + str(elapsed_time_mseg))
         printgetuforbydate(cont, lst, lmtinf, lmtsup)
 
     elif int(inputs[0]) == 7:
@@ -280,7 +306,15 @@ while True:
         lmtsup =  round(float(input("Ingrese el límite superior del rango de latitudes:\n>")),2)
         loninf =  round(float(input("Ingrese el límite inferior del rango de longitud:\n>")),2)
         lonsup =  round(float(input("Ingrese el límite superior del rango de longitud:\n>")),2)
+        #PRUEBA DE EJECUCIÓN
+        start_time = process_time()
+
         lst = (controller.getufosbylocalitation(cont, lmtinf, lmtsup, loninf, lonsup))
+
+        #PRUEBAS DE EJECUCIÓN
+        stop_time = process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("tiempo de ejecución: " + str(elapsed_time_mseg))
         printgetufosbylocalitation(cont, lst)
 
     else:
