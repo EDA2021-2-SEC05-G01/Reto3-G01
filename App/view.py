@@ -27,6 +27,7 @@ import controller
 from DISClib.ADT import list as lt
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map as mp
+
 import datetime
 from time import process_time
 assert cf
@@ -72,7 +73,7 @@ def printcargadedatos(cont):
 def printgetufosfromcity(cont, lst, city):
     print("\n---------------------------------------------------------------------------\n")
     print("El total de ciudades donde han habido avistamientos de UFOS es: " + 
-            str(controller.indexSize(cont, "cityIndex")))
+            str(mp.size(cont['cityIndex'])))
     size = lt.size(lst)
     if size:
         print("\n---------------------------------------------------------------------------\n")
@@ -95,6 +96,7 @@ def printgetufosfromcity(cont, lst, city):
                         + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo['shape'])
                 i += 1
         else:
+            print("\nUna muestra de los avistamientos en este rango de fechas:")
             for ufo in lst:
                 print("\n---------------------------------------------------------------------------\n")
                 print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + city + "\nPaís: " + ufo["country"]
@@ -117,29 +119,36 @@ def printgetufosfromduration(cont, lst, lmtinf, lmtsup):
     size = lt.size(lst)
     print("\n---------------------------------------------------------------------------\n")
     print("Hay " + str(size) + " avistamientos que duran entre " + str(lmtinf) + " y " + str(lmtsup) + " segundos")
+    print("\n---------------------------------------------------------------------------\n")
     if size:
-        i = 1
-        l = lt.newList("ARRAY_LIST")
-        print("\n---------------------------------------------------------------------------\n")
-        print("Los primeros tres avistamientos en este rango:")
-        while i <= 3:
-            ufo = lt.getElement(lst, i)
-            print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
-                    + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
-            uf = lt.lastElement(lst)
-            lt.removeLast(lst)
-            lt.addFirst(l, uf)
-            i += 1
-        print("\n---------------------------------------------------------------------------\n")
-        print("Los últimos tres avistamientos en este rango: ")
-        for u in lt.iterator(l):
-            print("\nDatatime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+        if size >6:
+            i = 1
+            l = lt.newList("ARRAY_LIST")
+            print("Los primeros tres avistamientos en este rango:")
+            while i <= 3:
+                ufo = lt.getElement(lst, i)
+                print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
+                        + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
+                uf = lt.lastElement(lst)
+                lt.removeLast(lst)
+                lt.addFirst(l, uf)
+                i += 1
+            print("\n---------------------------------------------------------------------------\n")
+            print("Los últimos tres avistamientos en este rango: ")
+            for u in lt.iterator(l):
+                print("\nDatatime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+        else:
+            print("\nUna muestra de los avistamientos en este rango de fechas:")
+            for u in lt.iterator(lst):
+                print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
                     + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+
 
 
 def printgetuforbydate(cont,lst, lmtinf, lmtsup):
     print("\n---------------------------------------------------------------------------\n")
-    print("Hay " + str(lt.size(cont['lstdates'])) + " fechas [YYYY-MM-DD] diferentes en las que se han reportado ufos.")
+    print("Hay " + str(controller.indexSize(cont, "dates")) + " fechas [YYYY-MM-DD] diferentes en las que se han reportado ufos.")
     print("\n---------------------------------------------------------------------------\n")
     print("La fecha más antigua en la que se ha reportado un avistamiento es:\n" + str(controller.minKey(cont, "dates")) +
             ": " + str(lt.size(((om.get(cont["dates"], controller.minKey(cont, "dates")))['value'])['lstufos'])))
@@ -147,25 +156,61 @@ def printgetuforbydate(cont,lst, lmtinf, lmtsup):
     if size:
         print("\n---------------------------------------------------------------------------\n")
         print("Hay " + str(size) + " UFOS reportados entre " + str(lmtinf) + " y " + str(lmtsup))
-        i = 1
-        l = lt.newList("ARRAY_LIST")
         print("\n---------------------------------------------------------------------------\n")
-        print("Los primeros tres avistamientos en este rango:")
-        while i <= 3:
-            ufo = lt.getElement(lst, i)
-            print("\nDatetime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
-                    + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
-            uf = lt.lastElement(lst)
-            lt.removeLast(lst)
-            lt.addFirst(l, uf)
-            i += 1
+        if size >6:
+            i = 1
+            l = lt.newList("ARRAY_LIST")
+            print("Los primeros tres avistamientos en este rango:")
+            while i <= 3:
+                ufo = lt.getElement(lst, i)
+                print("\nDatetime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
+                        + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
+                uf = lt.lastElement(lst)
+                lt.removeLast(lst)
+                lt.addFirst(l, uf)
+                i += 1
+            print("\n---------------------------------------------------------------------------\n")
+            print("Los últimos tres avistamientos en este rango: ")
+            for u in lt.iterator(l):
+                print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+        else:
+            print("\nUna muestra de los avistamientos en este rango de fechas:")
+            for u in lt.iterator(lst):
+                print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+
+        
+def printgetufosbylocalitation(cont, lst):
+    size = lt.size(lst)
+    if size:
         print("\n---------------------------------------------------------------------------\n")
-        print("Los últimos tres avistamientos en este rango: ")
-        for u in lt.iterator(l):
-            print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
-                    + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
-
-
+        print("Han habido " + str(size) + " avistamientos en esta área geográfica.")
+        print("\n---------------------------------------------------------------------------\n")
+        if size >10:
+            i = 1
+            l = lt.newList("ARRAY_LIST")
+            print("Los primeros tres avistamientos en este rango:")
+            while i <= 5:
+                ufo = lt.getElement(lst, i)
+                print("\nDatetime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
+                        + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
+                uf = lt.lastElement(lst)
+                lt.removeLast(lst)
+                lt.addFirst(l, uf)
+                i += 1
+            print("\n---------------------------------------------------------------------------\n")
+            print("Los últimos tres avistamientos en este rango: ")
+            for u in lt.iterator(l):
+                print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+        else:
+            print("\nUna muestra de los avistamientos en esta zona geográfica:")
+            for u in lt.iterator(lst):
+                print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+    else:
+        print("No han habido avistamientos en esa localización geográfica dada.")
 
 
 
@@ -221,10 +266,6 @@ while True:
     elif int(inputs[0]) == 4:
         lmtinf = float(input("Ingrese el límite inferior de duración:\n>"))
         lmtsup = float(input("Ingrese el límite superior de duración:\n>"))
-        print('Altura del arbol: ' + str(controller.indexHeight(cont, "durationn")))
-        print('Elementos en el arbol: ' + str(controller.indexSize(cont, "durationn")))
-        print('Menor Llave: ' + str(controller.minKey(cont, "durationn")))
-        print('Mayor Llave: ' + str(controller.maxKey(cont, "durationn")))
         lst = controller.getufosfromduration(cont, lmtinf, lmtsup)
         printgetufosfromduration(cont, lst, lmtinf, lmtsup)
 
@@ -239,12 +280,8 @@ while True:
         lmtsup =  round(float(input("Ingrese el límite superior del rango de latitudes:\n>")),2)
         loninf =  round(float(input("Ingrese el límite inferior del rango de longitud:\n>")),2)
         lonsup =  round(float(input("Ingrese el límite superior del rango de longitud:\n>")),2)
-        print('Altura del arbol: ' + str(controller.indexHeight(cont, "latitudes")))
-        print('Elementos en el arbol: ' + str(controller.indexSize(cont, "latitudes")))
-        print('Menor Llave: ' + str(controller.minKey(cont, "latitudes")))
-        print('Mayor Llave: ' + str(controller.maxKey(cont, "latitudes")))
-        print(controller.getufosbylocalitation(cont, lmtinf, lmtsup, loninf, lonsup))
-
+        lst = (controller.getufosbylocalitation(cont, lmtinf, lmtsup, loninf, lonsup))
+        printgetufosbylocalitation(cont, lst)
 
     else:
         sys.exit(0)
