@@ -190,7 +190,7 @@ def printgetufosbylocalitation(cont, lst):
         if size >10:
             i = 1
             l = lt.newList("ARRAY_LIST")
-            print("Los primeros tres avistamientos en este rango:")
+            print("Los primeros cinco avistamientos en este rango:")
             while i <= 5:
                 ufo = lt.getElement(lst, i)
                 print("\nDatetime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
@@ -200,7 +200,7 @@ def printgetufosbylocalitation(cont, lst):
                 lt.addFirst(l, uf)
                 i += 1
             print("\n---------------------------------------------------------------------------\n")
-            print("Los últimos tres avistamientos en este rango: ")
+            print("Los últimos cinco avistamientos en este rango: ")
             for u in lt.iterator(l):
                 print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
                         + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
