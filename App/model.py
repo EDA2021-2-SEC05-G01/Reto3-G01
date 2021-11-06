@@ -56,15 +56,12 @@ def newAnalyzer():
     Retorna el analizador inicializado.
     """
     analyzer = {'ufos':None,
-                'dateIndex': None,
                 'cityIndex': None,
                 'duration': None,
                 'dates': None,
                 'latitudes': None
                 }
     analyzer['ufos'] = lt.newList("ARRAY_LIST")
-    analyzer['dateIndex'] = om.newMap(omaptype='RBT',
-                                      comparefunction=compareDates)
     analyzer['cityIndex'] = m.newMap(numelements=805,
                                         maptype='CHAINING',
                                         loadfactor=2.0,)
@@ -80,25 +77,11 @@ def newAnalyzer():
 
 def addCrime(analyzer, ufo):
     lt.addLast(analyzer['ufos'], ufo)
-    updateDateIndex(analyzer['dateIndex'], ufo)
     updatecityIndex(analyzer['cityIndex'], ufo)
     updatedurationindex(analyzer['durationn'], ufo)
     updatedateIndex(analyzer['dates'], ufo)
     updatelatitudeIndex(analyzer['latitudes'], ufo)
     return analyzer
-
-
-def updateDateIndex(map, ufo):
-    datet = ufo['datetime']
-    ufodate = datetime.datetime.strptime(datet, '%Y-%m-%d %H:%M:%S')
-    entry = om.get(map, ufodate.date())
-    if entry is None:
-        datentry = newDataEntry(ufo)
-        om.put(map, ufodate.date(), datentry)
-    else:
-        datentry = me.getValue(entry)
-    addDateIndex(datentry, ufo)
-    return map
 
 def updatecityIndex(map, ufo):
     city = ufo["city"]

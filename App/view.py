@@ -203,12 +203,14 @@ def printgetufosbylocalitation(cont, lst):
             print("Los últimos cinco avistamientos en este rango: ")
             for u in lt.iterator(l):
                 print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
-                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"]
+                        + "\nLatitud:" + str(u['latitude']) + "\nLongitud: " + str(u['longitude']))
         else:
             print("\nUna muestra de los avistamientos en esta zona geográfica:")
             for u in lt.iterator(lst):
                 print("\nDatetime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
-                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"]
+                        + "\nLatitud:" + str(u['latitude']) + "\nLongitud: " + str(u['longitude']))
     else:
         print("No han habido avistamientos en esa localización geográfica dada.")
 
