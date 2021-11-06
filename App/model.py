@@ -228,34 +228,29 @@ def getufosfromcity(analyzer, city):
 
 def getufosfromduration(analyzer, lmtinf, lmtsup):
     lst = lt.newList("ARRAY_LIST")
-    while lmtinf <= lmtsup:
-        ufos = om.get(analyzer['durationn'], lmtinf)
-        if ufos != None:
-            ufos = (ufos['value'])['lstufos']
-            for ufo in lt.iterator(ufos):
-                lt.addLast(lst, ufo)
-        lmtinf = float(lmtinf) + 1
-    compared(lst)
+    keys = om.keys(analyzer['durationn'], lmtinf, lmtsup)
+    for key in lt.iterator(keys):
+        ufos = om.get(analyzer['durationn'], key)
+        ufos = (ufos['value'])['lstufos']
+        compared(ufos)
+        for ufo in lt.iterator(ufos):
+            lt.addLast(lst, ufo)
     return lst
 
 def getuforbydate(analyzer, lmtinf, lmtsup):
     dates = analyzer['dates']
-    lstdates = om.keySet(dates)
     lista = lt.newList("ARRAY_LIST")
     lmtinf = datetime.datetime.strptime(lmtinf, '%Y-%m-%d')
     lmtsup = datetime.datetime.strptime(lmtsup, '%Y-%m-%d')
-    posi = lt.isPresent(lstdates, om.ceiling(dates, lmtinf.date()))
-    posf = lt.isPresent(lstdates, om.floor(dates, lmtsup.date()))
-    while posi <= posf:
-        elemento = (om.get(dates, lt.getElement(lstdates, posi))['value'])['lstufos']
+    keys = om.keys(dates, lmtinf.date(), lmtsup.date())
+    for key in lt.iterator(keys):
+        elemento = (om.get(dates, key)['value'])['lstufos']
         for e in lt.iterator(elemento):
             lt.addLast(lista, e)
-        posi += 1
+    compareda(lista)
     return lista
 
 def getufosbylocalitation(analyzer, lmtinf, lmtsup, loninf, lonsup):
-    lmtinf = om.ceiling(analyzer['latitudes'], lmtinf)
-    lmtsup = om.floor(analyzer['latitudes'], lmtsup)
     lista = lt.newList("ARRAY_LIST")
     lstlatitudes = om.keys(analyzer['latitudes'], lmtinf, lmtsup)
     for lat in lt.iterator(lstlatitudes):
@@ -360,7 +355,7 @@ def comparedur(dur1, dur2):
     return float(dur1) > float(dur2)
 
 def comparedo(d1, d2):
-    return float(d1['duration (seconds)']) < float(d2['duration (seconds)'])
+    return d1['city'] < d2['city']
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
