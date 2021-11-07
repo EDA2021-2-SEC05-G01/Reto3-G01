@@ -61,6 +61,9 @@ def loadData(analyzer, ufosfile):
 
 # Funciones de ordenamiento
 
+def compared(lst):
+    return model.compared(lst)
+
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________

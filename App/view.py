@@ -119,20 +119,24 @@ def printgetufosfromduration(cont, lst, lmtinf, lmtsup):
     size = lt.size(lst)
     print("\n---------------------------------------------------------------------------\n")
     print("Hay " + str(size) + " avistamientos que duran entre " + str(lmtinf) + " y " + str(lmtsup) + " segundos")
-    print("\n---------------------------------------------------------------------------\n")
     if size:
+        controller.compared(lst)
         if size >6:
             i = 1
             l = lt.newList("ARRAY_LIST")
-            print("Los primeros tres avistamientos en este rango:")
+            li = lt.newList("ARRAY_LIST")
             while i <= 3:
                 ufo = lt.getElement(lst, i)
-                print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
-                        + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
+                lt.addLast(li, ufo)
                 uf = lt.lastElement(lst)
                 lt.removeLast(lst)
                 lt.addFirst(l, uf)
                 i += 1
+            print("\n---------------------------------------------------------------------------\n")
+            print("Los primeros tres avistamientos en este rango: ")
+            for u in lt.iterator(li):
+                print("\nDatatime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                        + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
             print("\n---------------------------------------------------------------------------\n")
             print("Los últimos tres avistamientos en este rango: ")
             for u in lt.iterator(l):
@@ -160,7 +164,7 @@ def printgetuforbydate(cont,lst, lmtinf, lmtsup):
         if size >6:
             i = 1
             l = lt.newList("ARRAY_LIST")
-            print("Los primeros tres avistamientos en este rango:")
+            print("Los primeros tres avistamientos en este rango: ")
             while i <= 3:
                 ufo = lt.getElement(lst, i)
                 print("\nDatetime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
@@ -235,7 +239,7 @@ def printMenu():
     print("0- Cerrar la aplicación")
     print("*******************************************")
 
-ufofile = 'UFOS-utf8-small.csv'
+ufofile = 'UFOS-utf8-large.csv'
 cont = None
 
 """

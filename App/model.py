@@ -232,7 +232,6 @@ def getufosfromduration(analyzer, lmtinf, lmtsup):
     for key in lt.iterator(keys):
         ufos = om.get(analyzer['durationn'], key)
         ufos = (ufos['value'])['lstufos']
-        compared(ufos)
         for ufo in lt.iterator(ufos):
             lt.addLast(lst, ufo)
     return lst
@@ -355,7 +354,8 @@ def comparedur(dur1, dur2):
     return float(dur1) > float(dur2)
 
 def comparedo(d1, d2):
-    return d1['city'] < d2['city']
+    if d1['duration (seconds)'] == d2['duration (seconds)']:
+        return d1['city'] < d2['city']
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
