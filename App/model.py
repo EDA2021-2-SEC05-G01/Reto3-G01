@@ -223,7 +223,6 @@ def newlatitudeEntry(ufo):
 
 def getufosfromcity(analyzer, city):
     lst = (m.get(analyzer['cityIndex'], city)['value'])
-    compareda(lst)
     return lst
 
 def getufosfromduration(analyzer, lmtinf, lmtsup):
@@ -246,7 +245,6 @@ def getuforbydate(analyzer, lmtinf, lmtsup):
         elemento = (om.get(dates, key)['value'])['lstufos']
         for e in lt.iterator(elemento):
             lt.addLast(lista, e)
-    compareda(lista)
     return lista
 
 def getufosbylocalitation(analyzer, lmtinf, lmtsup, loninf, lonsup):
@@ -257,7 +255,6 @@ def getufosbylocalitation(analyzer, lmtinf, lmtsup, loninf, lonsup):
         for l in lt.iterator(la):
             if round(float(l['longitude']),2) >= loninf and round(float(l['longitude']),2) <= lonsup:
                 lt.addLast(lista, l)
-    compareda(lista)
     return lista
 
 

@@ -76,6 +76,7 @@ def printgetufosfromcity(cont, lst, city):
             str(mp.size(cont['cityIndex'])))
     size = lt.size(lst)
     if size:
+        controller.compareda(lst)
         print("\n---------------------------------------------------------------------------\n")
         print("Han sido registrados " + str(size) + " UFOS en la ciudad " + city)
         print("\n---------------------------------------------------------------------------\n")
@@ -162,6 +163,7 @@ def printgetuforbydate(cont,lst, lmtinf, lmtsup):
         print("Hay " + str(size) + " UFOS reportados entre " + str(lmtinf) + " y " + str(lmtsup))
         print("\n---------------------------------------------------------------------------\n")
         if size >6:
+            controller.compareda(lst)
             i = 1
             l = lt.newList("ARRAY_LIST")
             print("Los primeros tres avistamientos en este rango: ")
@@ -192,6 +194,7 @@ def printgetufosbylocalitation(cont, lst):
         print("Han habido " + str(size) + " avistamientos en esta área geográfica.")
         print("\n---------------------------------------------------------------------------\n")
         if size >10:
+            controller.compareda(lst)
             i = 1
             l = lt.newList("ARRAY_LIST")
             print("Los primeros cinco avistamientos en este rango:")

@@ -64,6 +64,9 @@ def loadData(analyzer, ufosfile):
 def compared(lst):
     return model.compared(lst)
 
+def compareda(lista):
+    return model.compareda(lista)
+
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
