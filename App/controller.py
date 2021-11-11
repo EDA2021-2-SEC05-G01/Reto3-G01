@@ -84,6 +84,10 @@ def getuforbydate(analyzer, lmtinf, lmtsup):
 def getufosbylocalitation(analyzer, lmtinf, lmtsup, loninf, lonsup):
     return model.getufosbylocalitation(analyzer, lmtinf, lmtsup, loninf, lonsup)
 
+def ObtenerAvistamientoPorRangoHoras(analyzer, lmtinf, lmtsup):
+    max, contador, lista = model.ObtenerAvistamientoPorRangoHoras(analyzer,lmtinf,lmtsup)
+    return max, contador, lista
+
 def UFOSSize(analyzer):
     """
     Numero de UFOS leidos

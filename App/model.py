@@ -59,6 +59,7 @@ def newAnalyzer():
                 'cityIndex': None,
                 'duration': None,
                 'dates': None,
+                "hora/minuto":None,
                 'latitudes': None
                 }
     analyzer['ufos'] = lt.newList("ARRAY_LIST")
@@ -71,6 +72,8 @@ def newAnalyzer():
                                       comparefunction=compareDates)
     analyzer['latitudes'] = om.newMap(omaptype='RBT',
                                     comparefunction=comparelatitudes)
+    analyzer["hora/minuto"] = om.newMap(omaptype="RBT",
+                                    comparefunction=compare_hour)
     return analyzer
 
 # Funciones para agregar informacion al catalogo
@@ -81,6 +84,7 @@ def addCrime(analyzer, ufo):
     updatedurationindex(analyzer['durationn'], ufo)
     updatedateIndex(analyzer['dates'], ufo)
     updatelatitudeIndex(analyzer['latitudes'], ufo)
+    updateHour(analyzer, ufo)
     return analyzer
 
 def updatecityIndex(map, ufo):
@@ -117,6 +121,22 @@ def updatedateIndex(map, ufo):
         datentry = me.getValue(entry)
     addDateIndex(datentry, ufo)
     return map
+
+def updateHour(map, ufo):
+    mapa = map["hora/minuto"]
+    fecha = (ufo["datetime"].split())[1]
+
+    existencia = om.get(mapa,fecha)
+
+    if existencia is None:
+        bucket = lt.newList(datastructure="SINGLE_LINKED",cmpfunction=compare_hour)
+        lt.addLast(bucket, ufo)
+        om.put(mapa, fecha, bucket)
+    else:
+        e = me.getValue(existencia)
+        lt.addLast(e, ufo)
+        ordenar_fechas(e)
+        om.put(mapa, fecha, e)
 
 def updatelatitudeIndex(map, ufo):
     lat = round(float(ufo['latitude']),2)
@@ -235,6 +255,28 @@ def getufosfromduration(analyzer, lmtinf, lmtsup):
             lt.addLast(lst, ufo)
     return lst
 
+def ObtenerAvistamientoPorRangoHoras(analyzer, lmtinf, lmtsup):
+
+    mapa = analyzer["hora/minuto"]
+    maximo = om.maxKey(mapa)
+    tupla_maximo = om.get(mapa, maximo)
+    bucket_maximo = me.getValue(tupla_maximo)
+    
+    contador = lt.size(bucket_maximo)
+
+    lista_rango = om.keys(mapa, lmtinf,lmtsup)
+
+    lista_final = lt.newList(datastructure="SINGLE_LINKED", cmpfunction=compare_hour)
+
+    for key in lt.iterator(lista_rango):
+        ufo = om.get(mapa, key)
+        bucket = me.getValue(ufo)
+        
+        for e in lt.iterator(bucket):
+            lt.addLast(lista_final, e)
+
+    return maximo, contador, lista_final
+
 def getuforbydate(analyzer, lmtinf, lmtsup):
     dates = analyzer['dates']
     lista = lt.newList("ARRAY_LIST")
@@ -325,6 +367,14 @@ def compareduration(d1, d2):
     else:
         return -1
 
+def compare_hour(d1, d2):
+    if (d1 == d2):
+        return 0
+    elif (d1[1] > d2[1]):
+        return 1
+    else:
+        return -1  
+
 def comparelatitudes(l1, l2):
     if (l1 == l2):
         return 0
@@ -369,6 +419,9 @@ def compareOffenses(offense1, offense2):
         return 1
     else:
         return -1
+def ordenar_fechas(lst):
+    mg.sort(lst, comparedat)
+    return lst
 
 def compareda(lst):
     mg.sort(lst, comparedat)

@@ -89,6 +89,7 @@ def printgetufosfromcity(cont, lst, city):
                         + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo['shape'])
                 i += 1
             i = size - 2
+            
             print("\n---------------------------------------------------------------------------\n")
             print("\nLos últimos 3 avistamientos en la ciudad " + city)
             while i <= size:
@@ -242,7 +243,7 @@ def printMenu():
     print("0- Cerrar la aplicación")
     print("*******************************************")
 
-ufofile = 'UFOS-utf8-large.csv'
+ufofile = 'UFOS-utf8-5pct.csv'
 cont = None
 
 """
@@ -295,6 +296,44 @@ while True:
         elapsed_time_mseg = (stop_time - start_time)*1000
         print("tiempo de ejecución: " + str(elapsed_time_mseg))
         printgetufosfromduration(cont, lst, lmtinf, lmtsup)
+
+    elif int(inputs[0]) == 5:
+
+        lmtinf = input("Escriba el limite inferior en formato (horas:minutos): ")
+        lmtsup = input("Escriba el limite superior formato (horas:minutos): ")
+        lim3=lmtsup+":01"
+        max, contador, lista = controller.ObtenerAvistamientoPorRangoHoras(cont,lmtinf,lim3)
+
+        avistamientos = lt.size(lista)
+        tamaño = lt.size(lista)
+
+        print("\n")
+        print("El avistamiento que ocurrio mas tarde fue a las: "+str(max)+" y ocurrió: "+str(contador)+" vez/veces")
+        print("\n")
+        print("Hay "+str(tamaño)+" avistamientos entre "+str(lmtinf)+" y "+str(lmtsup)+" segundos")
+        
+        i = 1
+        lst = lt.newList("ARRAY_LIST")
+        print("\n")
+        print("Los primeros 3 avistamientos en el rango son: ")
+        while i <= 3:
+            ufo = lt.getElement(lista, i)
+            print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nEstado: " + ufo["state"] 
+                + "\nPaís: " + ufo["country"] + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) 
+                + "\nForma del objeto: " + ufo["shape"] )
+            ultimo = lt.lastElement(lista)
+            lt.removeLast(lista)
+            lt.addFirst(lst, ultimo)
+            i+=1
+        print("\n")
+        print("Los ultimos 3 avistamientos en el rango: ")
+        for h in lt.iterator(lst):
+            print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
+                + "\nPaís: " + h["country"] + "\nDuración (segundos): " + str(h["duration (seconds)"]) 
+                + "\nForma del objeto: " + h["shape"] )       
+
+
+
 
     elif int(inputs[0]) == 6:
         lmtinf = input("Ingrese el límite inferior del rango de fechas:\n>")
