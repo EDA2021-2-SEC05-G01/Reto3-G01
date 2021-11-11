@@ -72,8 +72,8 @@ def newAnalyzer():
                                       comparefunction=compareDates)
     analyzer['latitudes'] = om.newMap(omaptype='RBT',
                                     comparefunction=comparelatitudes)
-    analyzer["hora/minuto"] = om.newMap(omaptype="RBT",
-                                    comparefunction=compare_hour)
+    analyzer["hora/minuto"] = om.newMap(omaptype="BST",
+                                    comparefunction=compareKeys)
     return analyzer
 
 # Funciones para agregar informacion al catalogo
@@ -438,3 +438,11 @@ def compared(lst):
 def compararfecha(lst):
     mg.sort(lst, comparefecha)
     return lst
+
+def compareKeys(key1,key2):
+    if key1==key2 :   
+        return  0
+    elif key1>key2:  
+        return  1
+    elif key1<key2:   
+        return -1
