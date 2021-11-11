@@ -270,7 +270,7 @@ def printMenu():
     print("0- Cerrar la aplicación")
     print("*******************************************")
 
-ufofile = 'UFOS-utf8-small.csv'
+ufofile = 'UFOS-utf8-large.csv'
 cont = None
 
 """
