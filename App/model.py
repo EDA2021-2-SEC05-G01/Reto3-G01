@@ -255,25 +255,18 @@ def getufosfromduration(analyzer, lmtinf, lmtsup):
     return lst
 
 def ObtenerAvistamientoPorRangoHoras(analyzer, lmtinf, lmtsup):
-
     mapa = analyzer["hora/minuto"]
     maximo = om.maxKey(mapa)
     tupla_maximo = om.get(mapa, maximo)
     bucket_maximo = me.getValue(tupla_maximo)
-    
     contador = lt.size(bucket_maximo)
-
     lista_rango = om.keys(mapa, lmtinf,lmtsup)
-
     lista_final = lt.newList(datastructure="SINGLE_LINKED", cmpfunction=compare_hour)
-
     for key in lt.iterator(lista_rango):
         ufo = om.get(mapa, key)
         bucket = me.getValue(ufo)
-        
         for e in lt.iterator(bucket):
             lt.addLast(lista_final, e)
-
     return maximo, contador, lista_final
 
 def getuforbydate(analyzer, lmtinf, lmtsup):
