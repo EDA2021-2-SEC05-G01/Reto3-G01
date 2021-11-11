@@ -135,7 +135,6 @@ def updateHour(map, ufo):
     else:
         e = me.getValue(existencia)
         lt.addLast(e, ufo)
-        ordenar_fechas(e)
         om.put(mapa, fecha, e)
 
 def updatelatitudeIndex(map, ufo):
